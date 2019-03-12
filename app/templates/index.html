@@ -1,24 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-   </head>
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4/css/tachyons.min.css">
+  </head>
   <body>
-    <div class="tab-pane fade show active" id="v-pills-1" role="tabpanel" aria-labelledby="v-pills-nextgen-tab">
-      <form action="/" method="post" class="search">
-        <div class="row">
-          <div class="col-md">
-            <div class="form-group">
-              <div class="form-field">
-                <input id="user_input"  name="input" type="text" class="form-control" placeholder="Search term...">
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="form-group">
-              <div class="form-field">
-                <input id="submit" type="submit" value="Search" class="form-control btn btn-primary">
-              </div>
-            </div>
+    <div class="pa4-l">
+      <form action="/" method="post" class="bg-light-blue mw7 center pa4 br2-ns ba b--black-10">
+        <div class="cf bn ma0 pa0">
+          <div class="cf">
+            <input id="user_input"  name="input" type="text" class="f6 f5-l input-reset bn fl black-80 bg-white pa3 lh-solid w-100 w-75-m w-80-l br2-ns br--left-ns" placeholder="Search term...">
+            <input id="submit" type="submit" value="Search" class="f6 f5-l button-reset fl pv3 tc bn bg-animate bg-black-70 hover-bg-black white pointer w-100 w-25-m w-20-l br2-ns br--right-ns">
           </div>
         </div>
       </form>
@@ -28,24 +19,28 @@
 			<div id="results_list" class="container">
 				<div class="row">
           {% for hit in res['hits']['hits'] %}
-            <div class="four">
-              <div className="overlay-title">
+          <article class="center mw5 mw7-ns br3 hidden ba b--black-10 mv4">
+            
+              <div className="f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">
                 {% for title in  hit['_source']['title']  %}
-                  <li class="title">{{title.title}}</li>
+                  <li class="list f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">{{title.title}}</li>
                 {% endfor %}
               </div>
-              <p>{{ hit['_source']['physicalDescription'] }}</p>
-              <p>{{ hit['_source']['object'] }}</p>
-                <div class="badge-wrap">
-                  {% for category in  hit['_source']['categories']  %}
-                    <li class="style">{{category.text}}</li>
-                  {% endfor %}
+              <div class="pa3 bt b--black-10">
+                <p class="f6 f5-ns lh-copy measure">Description: {{ hit['_source']['physicalDescription'] }}</p>
+                <p class="f6 f5-ns lh-copy measure">Object: {{ hit['_source']['object'] }}</p>
+
+                {% for category in  hit['_source']['categories']  %}
+                  <li class="list pv2 bl-0 bt-0 br-0 b--dotted b--black-30">{{category.text}}</li>
+                {% endfor %}
+
+                <div class="pv3">score: <a href="/"> {{ hit['_score'] }}</a></div>
+                <div class="pv3">
+                  <img src= {{ "http://media.vam.ac.uk/media/thira/collection_images/" + hit._source.images[0][0:6] + "/" + hit._source.images[0] + "_jpg_ws.jpg" if  hit._source.images[0] else "http://media.vam.ac.uk/media/thira/collection_images/2006AL/2006AL8007_jpg_ws.jpg"}} />
                 </div>
-            </div>
-            <div class="job-post-item-body d-block d-md-flex">
-              <div class="mr-3"><i class="fa fa-arrow-up" aria-hidden="true"></i> <span>{{ hit['_source']['upvote'] }}</span></div>
-              <div><span class="icon-layers"></span>score: <a href="/"> {{ hit['_score'] }}</a></div>
-            </div>
+              </div>
+              
+          </article>
           {% endfor %}
         </div>
       </div>
