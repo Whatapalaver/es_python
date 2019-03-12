@@ -10,3 +10,9 @@ To Run
 - To activate the virtualenv `source venv/bin/activate`
 - If you are using .flaskenv you can start the server with `flask run`
 - If you haven't set an environment variable you will need to run `export FLASK_APP=es_python.py` first.
+
+
+Shout-outs
+---
+
+- Basic Flask interface with Elasticsearch. [Blog and repo by Dinesh Sonachalam](https://medium.com/devopslinks/building-a-real-time-elastic-search-engine-using-python-32e05bcb9140).
