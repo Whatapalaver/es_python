@@ -7,7 +7,7 @@ es = Elasticsearch([{'host': 'localhost', 'port': 9100}])
 
 # creating a Blueprint class
 search_blueprint = Blueprint('search',__name__,template_folder="templates")
-search_term = ""
+search_term = "building"
 
 
 @search_blueprint.route('/', methods=['GET', 'POST'], endpoint='index')
