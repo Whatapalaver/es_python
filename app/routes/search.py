@@ -1,3 +1,4 @@
+# This is a basic implementation using elasticsearch.py library (as opposed to dsl)
 # make sure ES is up and running
 import requests, json
 from flask import Flask, Blueprint, jsonify, request, render_template
@@ -7,7 +8,7 @@ es = Elasticsearch([{'host': 'localhost', 'port': 9100}])
 
 # creating a Blueprint class
 search_blueprint = Blueprint('search',__name__,template_folder="templates")
-search_term = "building"
+search_term = ""
 
 # helper functions
 
@@ -30,15 +31,13 @@ def analyze(text, field=None, analyzer=None):
         whatToAnalyze = "field=%s" % field
     elif analyzer is not None:
         whatToAnalyze = "analyzer=%s" % analyzer
-    resp = requests.get("http://localhost:9100/objects_010319/_analyze?%s&format=yaml" % whatToAnalyze, 
+    resp = requests.get("http://localhost:9100/objects_150319/_analyze?%s&format=yaml" % whatToAnalyze, 
                         data=text)
     print(resp.text)
 
 
 @search_blueprint.route('/', methods=['GET', 'POST'], endpoint='index')
 def index():
-  # results = es.get(index='sw', doc_type='people', id=5)
-  # return jsonify(results['_source'])
   if request.method=='GET':
     res ={
           'hits': {'total': 0, 'hits': []}
@@ -53,22 +52,26 @@ def index():
         "query": {
           "multi_match": {
               "query": str(search_term),
-              "fields": ["physicalDescription", "object", "metadata^3"],
+              "fields" : ["metadata", "physicalDescription", "object" ],
               "type": "most_fields"
           }
         },
-        "size": 50,
+        "size": 5,
         "sort": [
 
         ]
       }
-      res = es.search(index="objects_010319", body=payload, explain=True)
+      res = es.search(index="objects_150319", body=payload, explain=True)
 
       # print(json.dumps(res['hits']['hits'][0]['_explanation'], indent=2))
-
+      
       print('*******Simple explain*********')
       print('')
       for hit in res['hits']['hits']:
+        print('')
+        if hit['_source']['title']:
+          print(hit['_source']['title'][0]['title'])
+        print('-----------------------------------')
         print(simplerExplain(hit['_explanation']))
       
       return render_template('index.html', res=res)
