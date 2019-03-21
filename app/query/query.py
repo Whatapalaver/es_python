@@ -8,7 +8,7 @@ client = Elasticsearch([{'host': 'localhost', 'port': 9100}])
 def ESQuery(index=None, 
             searchfields=None, 
             returnfields=None,
-            query=None, 
+            query=None, # search_term
             source_fields=None, 
             aggregations=None,
             advanced=None, # used to add additional 'must' advanced search fields to search
@@ -19,6 +19,7 @@ def ESQuery(index=None,
             nested_should=None,
             nested_range=None,
             preference="_primary_first",  
+            explain=None,
             offset=0, 
             limit=15, 
             fuzziness=1):
@@ -78,9 +79,7 @@ def ESQuery(index=None,
     if searchfields is not None:
       if query is not None and query != '':
         queries.append(Q("simple_query_string", query=query, default_operator="and", flags="PREFIX|PHRASE|NOT|AND|OR", fields=searchfields))
-    else:
-      if query is not None and query != '':
-        queries.append(Q("match", _all=query))
+
 
     if len(queries) > 1:
         s = s.query(Q('bool', should=queries))[offset:limit]
@@ -93,14 +92,49 @@ def ESQuery(index=None,
     if len(sort_order) > 0:
         s = s.sort(sort_order[0])
 
+
+
     if aggregations is not None:
         for agg in aggregations:
-            a = A('terms', field=agg[1], size=5)
+            a = A('terms', field=agg[1], size=10)
             s.aggs.bucket(agg[0], a)
 
-    print("Query: ", json.dumps(s.to_dict()))
-    s = s.extra(explain=True)
+    s = s.extra(explain=explain)
    
     results = s.execute()
+    print("Query: ", json.dumps(s.to_dict()))
+
+    print("Results: ", json.dumps(results.to_dict()))
+    return results
+
+
+def ObjectGetQuery(index=None, 
+                  searchfields=None, 
+                  returnfields=None,
+                  query=None, # search_term
+                  source_fields=None, 
+                  offset=0, 
+                  limit=15, 
+                  explain=False,
+                  fuzziness=1):
+    s = None
+    s = Search(using=client, index=index).source(returnfields)
+ 
+    q = None
+    queries = []
+
+    if searchfields is not None:
+      if query is not None and query != '':
+        queries.append(Q("simple_query_string", query=query, default_operator="and", flags="PREFIX|PHRASE|NOT|AND|OR", fields=searchfields))
+        s = s.query(Q('bool', must=queries[0]))[offset:limit]
+
+    if source_fields is not None:
+        s = s.extra(_source={'include': source_fields})
+
+    s = s.extra(explain=explain)
+   
+    results = s.execute()
+    print("ObjectGetQuery: ", json.dumps(s.to_dict()))
+
     # print("Results: ", json.dumps(results.to_dict()))
     return results

@@ -15,39 +15,53 @@
       </form>
     </div>
 
-		<section id="results_section" class="results_section">
-			<div id="results_list" class="container">
-				<div class="row">
-          {% for hit in res['hits']['hits'] %}
-          <article class="center mw5 mw7-ns br3 hidden ba b--black-10 mv4">
-            
-              <div className="f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">
-                {% for title in  hit['_source']['title']  %}
-                  <li class="list f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">{{title.title}}</li>
-                {% endfor %}
-                <li class="list f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">{{ 'Untitled' if not hit['_source']['title'] }}</li>
-              </div>
-              <div class="pa3 bt b--black-10">
-                <div class="pa3 bt b--black-10 cf">
-                  <p class="f6 f5-ns lh-copy measure fl">Description: {{ hit['_source']['physicalDescription'] }}</p>
-                  <div class="pv3 fr">
-                      <img src= {{ "http://media.vam.ac.uk/media/thira/collection_images/" + hit._source.images[0][0:6] + "/" + hit._source.images[0] + "_jpg_ws.jpg" if  hit._source.images[0] else "http://media.vam.ac.uk/media/thira/collection_images/2006AL/2006AL8007_jpg_ws.jpg"}} />
-                  </div>
-                </div>
-                <p class="f6 f5-ns lh-copy measure">Object: {{ hit['_source']['object'] }}</p>
-
-                {% for category in  hit['_source']['categories']  %}
-                  <li class="list pv2 bl-0 bt-0 br-0 b--dotted b--black-30">{{category.text}}</li>
-                {% endfor %}
-
-                <div class="pv3">score: <a href="/"> {{ hit['_score'] }}</a></div>
-                
-              </div>
-              
-          </article>
+    <article class="cf">
+      <div class="fl w-100 w-20-ns bg-near-white tc mv2 br3">
+        <div className="f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">
+            <p class="list f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">Aggregations</p>
+        </div>
+        <div>
+          {% for item in  res.aggregations.by_collection_code.buckets  %}
+            <li class="list f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">{{item.key, item.doc_count}}</li>
           {% endfor %}
         </div>
       </div>
-		</section>
+      <div class="fl w-100 w-75-ns">
+        <section id="results_section" class="results_section">
+          <div id="results_list" class="container">
+            <div class="row">
+              {% for hit in res['hits']['hits'] %}
+              <article class="center mw5 mw8-ns br3 hidden ba b--black-10 mv2">
+                <div className="f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">
+                  {% for title in  hit['_source']['title']  %}
+                    <li class="list f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">{{title.title}}</li>
+                  {% endfor %}
+                  <li class="list f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3">{{ 'Untitled' if not hit['_source']['title'] }}</li>
+                </div>
+                <div class="pa3 bt b--black-10">
+                  <div class="pa3 bt b--black-10 cf">
+                    <p class="f6 f5-ns lh-copy measure fl">Description: {{ hit['_source']['physicalDescription'] }}</p>
+                    <div class="pv3 fr">
+                        <img src= {{ "http://media.vam.ac.uk/media/thira/collection_images/" + hit._source.images[0][0:6] + "/" + hit._source.images[0] + "_jpg_ws.jpg" if  hit._source.images[0] else "http://media.vam.ac.uk/media/thira/collection_images/2006AL/2006AL8007_jpg_ws.jpg"}} />
+                    </div>
+                  </div>
+                  <p class="f6 f5-ns lh-copy measure">Object: {{ hit['_source']['object'] }}</p>
+                  <p class="f6 f5-ns lh-copy measure">MuseumNumber: {{ hit['_source']['museumNumber'] }}</p>
+                  <p class="f6 f5-ns lh-copy measure">UniqueId: <a href="http://127.0.0.1:5000/museumObject/{{ hit['_source']['uniqueID'] }}">{{ hit['_source']['uniqueID'] }}</a></p>
+                  <p class="f6 f5-ns lh-copy measure">Object Number: {{ hit['_source']['objectNumber'] }}</p>
+                  {% for category in  hit['_source']['categories']  %}
+                    <li class="list pv2 bl-0 bt-0 br-0 b--dotted b--black-30">{{category.text}}</li>
+                  {% endfor %}
+  
+                  <div class="pv3">score: <a href="/"> {{ hit['_score'] }}</a></div>
+                  
+                </div>
+              </article>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+      </div>
+    </article>
   </body>
 </html>
