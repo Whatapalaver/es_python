@@ -2,7 +2,7 @@ autopep8==1.4.3
 certifi==2019.3.9
 chardet==3.0.4
 Click==7.0
-elasticsearch==6.3.1
+elasticsearch==7.0.2
 elasticsearch-dsl>=6.0.0,<7.0.0
 Flask==1.0.2
 idna==2.8
